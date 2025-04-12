@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: ServerJars API
+  description: API for fetching Minecraft server jar types, versions, and specific jars.
+  version: 1.0.0
+
+servers:
+  - url: https://api.serverjars.in
+
+paths:
+  /v1/serverjars/fetchTypes:
+    get:
+      summary: Fetch all available server jar types
+      description: Retrieves a list of all available server jar types categorized by type.
+      operationId: fetchJarTypes
+      responses:
+        '200':
+          description: A list of server jar types
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: object
+                    properties:
+                      modded:
+                        type: array
+                        items:
+                          type: string
+                        description: Modded server types.
+                      proxies:
+                        type: array
+                        items:
+                          type: string
+                        description: Proxy server types.
+                      vanilla:
+                        type: array
+                        items:
+                          type: string
+                        description: Vanilla server types.
+                      servers:
+                        type: array
+                        items:
+                          type: string
+                        description: Other server types.
+                example:
+                  response:
+                    modded: ["mohist", "fabric", "forge"]
+                    proxies: ["waterfall", "bungeecord", "velocity"]
+                    vanilla: ["vanilla", "snapshot"]
+                    servers: ["paper", "purpur", "sponge"]
+
+  /v1/serverjars/fetchAll/{category}:
+    get:
+      summary: Fetch all available versions for a specific category
+      description: Retrieves all available versions for the specified server jar category.
+      operationId: fetchAllVersions
+      parameters:
+        - name: category
+          in: path
+          required: true
+          description: The server jar category (e.g., mohist, fabric, paper)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of versions for the specified category
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                          description: The version of the server jar.
+                        file:
+                          type: string
+                          description: The file name of the server jar.
+                example:
+                  response:
+                    - version: "1.21.1"
+                      file: "mohist-1.21.1.jar"
+                    - version: "1.20.1"
+                      file: "mohist-1.20.1.jar"
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                example:
+                  error: "Category not found"
+
+  /v1/serverjars/fetchJar/{type}/{version}:
+    get:
+      summary: Fetch a specific server jar by type and version
+      description: Retrieves a specific server jar file by its type and version.
+      operationId: fetchJar
+      parameters:
+        - name: type
+          in: path
+          required: true
+          description: The type of server jar (e.g., paper, forge)
+          schema:
+            type: string
+        - name: version
+          in: path
+          required: true
+          description: The version of the jar
+          schema:
+            type: string
+      responses:
+        '200':
+          description: URL of the requested server jar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        description: The download URL of the server jar.
+                example:
+                  response:
+                    url: "https://cdn.cxstudios.in/uploads/serverjars/jars/paper-1.21.1.jar"
+        '404':
+          description: Jar not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+                example:
+                  error: "Jar not found"
